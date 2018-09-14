@@ -2,6 +2,27 @@ let dealerHand = []
 let playerHand = []
 let deck = []
 
+const dealCardToPlayer = upOrDown => {
+  // Take one card from the deck
+  let card = deck.pop()
+
+  // Place that card in the dealer's hand
+  playerHand.push(card)
+
+  // Go find my dealer-hand div
+  const playerHandDiv = document.querySelector('.player-hand')
+
+  // Make a new image tag in memory
+  let image = document.createElement('img')
+
+  // Tell that image tag where it's image is. We do this dynamically
+  // based on the face and the suit
+  image.src = `/images/${card.face}${card.suit}.jpg`
+
+  // Push that image tag into the DIV as a child
+  playerHandDiv.appendChild(image)
+}
+
 const dealCardToDealer = upOrDown => {
   // Take one card from the deck
   let card = deck.pop()
@@ -27,6 +48,9 @@ const dealCardToDealer = upOrDown => {
   // Push that image tag into the DIV as a child
   dealerHandDiv.appendChild(image)
 }
+// If player hand is equal to over 21 player loses
+
+// If player hit stay dealers needs a hand better than players
 
 const main = () => {
   let suits = ['C', 'S', 'D', 'H']
@@ -78,7 +102,10 @@ const main = () => {
   dealCardToDealer('up')
   dealCardToDealer('down')
 
-  document.querySelector('button').addEventListener('click', dealCardToDealer)
+  dealCardToPlayer('up')
+  dealCardToPlayer('up')
+
+  document.querySelector('button').addEventListener('click', dealCardToPlayer)
 
   document.querySelector('.new-game').addEventListener('click', () => {
     document.location = '/'
