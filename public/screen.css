@@ -13,6 +13,21 @@ body {
   background-position: center;
 }
 
+:root {
+  --aspect-ratio: 1056px/691;
+}
+
+.dealer-hand {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.dealer-hand img {
+  width: 90px;
+  height: calc(var(--aspect-ratio) * 90);
+}
+
 .main-container {
   display: flex;
   flex-direction: row;
@@ -23,6 +38,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 5px;
 }
 
 .logo {
@@ -43,16 +59,30 @@ body {
   justify-content: center;
 }
 
-.buttons {
+button {
   display: flex;
   justify-content: center;
-  height: 2em;
+  align-items: center;
+  height: 30px;
   margin: 5px;
+  border-radius: 10%;
+  background-color: grey;
+  font-size: 1.5em;
 }
 
-.dealercard {
+button:hover {
+  background-color: teal;
+}
+
+main section {
   display: flex;
-  padding-top: -15em;
+  justify-content: center;
+  /* border: 5px solid purple; */
+}
+
+main div {
+  display: flex;
+  justify-content: center;
 }
 
 .moreimgs img {

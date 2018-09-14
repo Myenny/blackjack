@@ -1,5 +1,35 @@
+let dealerHand = []
+let playerHand = []
+let deck = []
+
+const dealCardToDealer = upOrDown => {
+  // Take one card from the deck
+  let card = deck.pop()
+
+  // Place that card in the dealer's hand
+  dealerHand.push(card)
+
+  // Go find my dealer-hand div
+  const dealerHandDiv = document.querySelector('.dealer-hand')
+
+  // Make a new image tag in memory
+  let image = document.createElement('img')
+
+  // Tell that image tag where it's image is. We do this dynamically
+  // based on the face and the suit
+  image.src = `/images/${card.face}${card.suit}.jpg`
+
+  if (upOrDown === 'down') {
+    // Do something to display this card down
+    image.src = `/img/cardback.png`
+  }
+
+  // Push that image tag into the DIV as a child
+  dealerHandDiv.appendChild(image)
+}
+
 const main = () => {
-  let suits = ['clubs', 'spades', 'diamonds', 'hearts']
+  let suits = ['C', 'S', 'D', 'H']
   let cards = [
     { value: 2, face: '2' },
     { value: 3, face: '3' },
@@ -15,8 +45,6 @@ const main = () => {
     { value: 10, face: 'K' },
     { value: 11, face: 'A' }
   ]
-
-  let deck = []
 
   // loop through all the suits
   suits.forEach(suit => {
@@ -47,7 +75,14 @@ const main = () => {
     deck[j] = firstCard
   }
 
-  console.log(deck)
+  dealCardToDealer('up')
+  dealCardToDealer('down')
+
+  document.querySelector('button').addEventListener('click', dealCardToDealer)
+
+  document.querySelector('.new-game').addEventListener('click', () => {
+    document.location = '/'
+  })
 }
 
 document.addEventListener('DOMContentLoaded', main)
