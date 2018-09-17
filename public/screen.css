@@ -70,7 +70,6 @@ body {
   display: flex;
   padding-left: 2em;
   justify-content: center;
-  border: 5px solid purple;
 }
 
 section .dealer {
@@ -96,7 +95,7 @@ button:hover {
 main section {
   display: flex;
   justify-content: center;
-  /* border: 5px solid purple; */
+  /*border: 5px solid purple; */
 }
 
 .dealer {
@@ -106,4 +105,12 @@ main section {
 .moreimgs img {
   display: flex;
   align-items: baseline;
+}
+
+div.playertotal {
+  font-size: 1.5rem;
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  border: 5px solid purple;
 }
