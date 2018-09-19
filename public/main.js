@@ -1,263 +1,231 @@
-let dealerHand = []
-let playerHand = []
-let deck = []
-let playerTotal = 0
-let dealerTotal = 0
-
-let countPlayerTotal = () => {
-  if (playerHand.length === 2) {
-    playerTotal = playerHand[0].value + playerHand[1].value
-    document.querySelector(
-      '.playertotal'
-    ).textContent = `Total = ${playerTotal}`
+class Hand {
+  constructor () {
+    this.cards = []
   }
 
-  if (playerHand.length === 3) {
-    playerTotal =
-      playerHand[0].value + playerHand[1].value + playerHand[2].value
-    document.querySelector(
-      '.playertotal'
-    ).textContent = `Total = ${playerTotal}`
+  hit (deck) {
+    let card = deck.takeOneCard()
+
+    this.cards.push(card)
+
+    return card
   }
 
-  if (playerHand.length === 4) {
-    playerTotal =
-      playerHand[0].value +
-      playerHand[1].value +
-      playerHand[2].value +
-      playerHand[3].value
-    document.querySelector(
-      '.playertotal'
-    ).textContent = `Total = ${playerTotal}`
+  value () {
+    let total = 0
+    this.cards.forEach(card => {
+      total += card.value
+    })
+
+    return total
   }
 
-  if (playerHand.length === 5) {
-    playerTotal =
-      playerHand[0].value +
-      playerHand[1].value +
-      playerHand[2].value +
-      playerHand[3].value +
-      playerHand[4].value
-    document.querySelector(
-      '.playertotal'
-    ).textContent = `Total = ${playerTotal}`
+  busted () {
+    return this.value() > 21
+  }
+
+  dealerShouldHit () {
+    return this.value() < 17
   }
 }
 
-let countDealerTotal = () => {
-  if (dealerHand.length === 2) {
-    dealerTotal = dealerHand[0].value + dealerHand[1].value
+class Card {
+  constructor (suit, value, face) {
+    this.suit = suit
+    this.value = value
+    this.face = face
   }
 
-  if (dealerHand.length === 3) {
-    dealerTotal =
-      dealerHand[0].value + dealerHand[1].value + dealerHand[2].value
+  imageDOM () {
+    let image = document.createElement('img')
+    image.src = this.imageURL()
+
+    return image
   }
 
-  if (dealerHand.length === 4) {
-    dealerTotal =
-      dealerHand[0].value +
-      dealerHand[1].value +
-      dealerHand[2].value +
-      dealerHand[3].value
+  imageURL () {
+    return `/images/${this.face}${this.suit}.jpg`
+  }
+}
+
+class Deck {
+  constructor () {
+    this.cards = []
+
+    let suits = ['C', 'S', 'D', 'H']
+    let cards = [
+      { value: 2, face: '2' },
+      { value: 3, face: '3' },
+      { value: 4, face: '4' },
+      { value: 5, face: '5' },
+      { value: 6, face: '6' },
+      { value: 7, face: '7' },
+      { value: 8, face: '8' },
+      { value: 9, face: '9' },
+      { value: 10, face: '10' },
+      { value: 10, face: 'J' },
+      { value: 10, face: 'Q' },
+      { value: 10, face: 'K' },
+      { value: 11, face: 'A' }
+    ]
+
+    // loop through all the suits
+    suits.forEach(suit => {
+      // Do this for each suit
+
+      // For this suit go through the cards
+      cards.forEach(card => {
+        // make a new card to put in the deck
+        let newCardForTheDeck = new Card(suit, card.value, card.face)
+
+        // add it to the deck
+        this.cards.push(newCardForTheDeck)
+      })
+    })
+
+    // Shuffle the deck into a random order
+    //
+    // Uses [Fisher–Yates shuffle](https://en.wikipedia.org/wiki/Fisher–Yates_shuffle)
+    for (let i = 52 - 1; i > 1; i -= 1) {
+      let j = Math.floor(Math.random() * i)
+      let firstCard = this.cards[i]
+      let secondCard = this.cards[j]
+      this.cards[i] = secondCard
+      this.cards[j] = firstCard
+    }
   }
 
-  if (dealerHand.length === 5) {
-    dealerTotal =
-      dealerHand[0].value +
-      dealerHand[1].value +
-      dealerHand[2].value +
-      dealerHand[3].value +
-      dealerHand[4].value
+  takeOneCard () {
+    let card = this.cards.pop()
+    return card
+  }
+}
+
+// sets deck to an empty array
+let deck = new Deck()
+
+// sets dealer hand to an empty array
+let dealerHand = new Hand()
+
+// sets player hand to an empty array
+let playerHand = new Hand()
+
+// where the player score is displayed
+let showPlayer = document.querySelector('.player-score')
+
+// where the dealer score is diplayed
+let showDealer = document.querySelector('.dealer-score')
+
+// where message for game status is diplayed
+let displayStatus = document.querySelector('.winlose')
+
+let showPlayerValue = () => {
+  showPlayer.textContent = playerHand.value()
+}
+
+let showDealerValue = () => {
+  showDealer.textContent = dealerHand.value()
+  checkWinner()
+}
+
+// determines who won
+const checkWinner = () => {
+  if (dealerHand.value() > playerHand.value()) {
+    displayStatus.textContent =
+      'DEALER HAS ' + `${showDealer.textContent}` + ', YOU LOSE.'
+  }
+
+  if (dealerHand.value() < playerHand.value()) {
+    displayStatus.textContent =
+      'YOU HAVE ' + `${showPlayer.textContent}` + ', YOU WIN!'
+  }
+
+  if (dealerHand.value() === playerHand.value()) {
+    displayStatus.textContent =
+      'YOU BOTH HAVE' + `${showPlayer.textContent}` + ', THE DEALER WINS.'
+  }
+}
+
+// arguments for the stay button and ends game if dealer busts
+const noMore = () => {
+  // hides the stay and hit button and back of card image in dealers hand.
+  document.querySelector('.hits').classList.add('hideme')
+  document.querySelector('.stays').classList.add('hideme')
+  document.querySelector('.back').classList.add('hideme')
+
+  dealCardToDealer()
+  showDealerValue()
+
+  if (dealerHand.dealerShouldHit()) {
+    noMore()
+  }
+
+  if (!dealerHand.dealerShouldHit() && !dealerHand.busted()) {
+    checkWinner()
+  }
+
+  if (dealerHand.busted()) {
+    displayStatus.textContent =
+      'DEALER BUSTED WITH ' + `${showDealer.textContent}` + ', YOU WIN!'
+  }
+}
+
+// argument for the hit button and ends game if player busts
+const giveMore = () => {
+  dealCardToPlayer()
+  showPlayerValue()
+
+  if (playerHand.busted()) {
+    document.querySelector('.hits').classList.add('hideme')
+    document.querySelector('.stays').classList.add('hideme')
+    displayStatus.textContent = 'YOU BUSTED, PLAY AGAIN'
+  } else {
+    displayStatus.textContent =
+      'YOU HAVE ' + `${showPlayer.textContent}` + ', HIT OR STAY'
   }
 }
 
 const dealCardToPlayer = upOrDown => {
-  // Take one card from the deck
-  let card = deck.pop()
-
-  // Place that card in the dealer's hand
-  playerHand.push(card)
+  let card = playerHand.hit(deck)
 
   // Go find my dealer-hand div
   const playerHandDiv = document.querySelector('.player-hand')
 
-  // Make a new image tag in memory
-  let image = document.createElement('img')
+  playerHandDiv.appendChild(card.imageDOM())
 
-  // Tell that image tag where it's image is. We do this dynamically
-  // based on the face and the suit
-  image.src = `/images/${card.face}${card.suit}.jpg`
-
-  // Push that image tag into the DIV as a child
-  playerHandDiv.appendChild(image)
+  showPlayerValue()
 }
 
 const dealCardToDealer = upOrDown => {
-  // Take one card from the deck
-  let card = deck.pop()
-
-  // Place that card in the dealer's hand
-  dealerHand.push(card)
+  let card = dealerHand.hit(deck)
 
   // Go find my dealer-hand div
   const dealerHandDiv = document.querySelector('.dealer-hand')
 
-  // Make a new image tag in memory
-  let image = document.createElement('img')
-
-  // Tell that image tag where it's image is. We do this dynamically
-  // based on the face and the suit
-  image.src = `/images/${card.face}${card.suit}.jpg`
-
-  if (upOrDown === 'down') {
-    // Do something to display this card down
-    image.src = `/img/cardback.png`
-  }
-
   // Push that image tag into the DIV as a child
-  dealerHandDiv.appendChild(image)
+  let newCardImage = card.imageDOM()
+  dealerHandDiv.appendChild(newCardImage)
 }
-
-const winnerDeclared = () => {
-  let winDeclareStatement = document.querySelector('.outcome')
-
-  countDealerTotal()
-  countPlayerTotal()
-
-  if (dealerTotal !== 0 && playerTotal !== 0) {
-    if (dealerTotal >= 22) {
-      winDeclareStatement.textContent =
-        'Dealer Busts with ' + `${dealerTotal}` + '.You Win!'
-    }
-
-    if (dealerTotal > playerTotal && dealerTotal <= 21) {
-      winDeclareStatement.textContent =
-        'Dealer has ' + `${dealerTotal}` + '. You Lose'
-    }
-
-    if (dealerTotal < playerTotal) {
-      winDeclareStatement.textContent =
-        'Dealer has ' + `${dealerTotal}` + '. You Win!'
-    }
-
-    if (dealerTotal === playerTotal) {
-      winDeclareStatement.textContent =
-        'Dealer has ' + `${dealerTotal}` + '. You Lose'
-    }
-  }
-}
-
-playerChoseToHit = () => {
-  dealCardToPlayer()
-  countPlayerTotal()
-  if (playerTotal >= 22) {
-    document.querySelector('.outcome').textContent = 'You Bust. Dealer Wins!'
-    document.querySelector('.hitbutton').classList.add('hide-button')
-    document.querySelector('.staybutton').classList.add('hide-button')
-  }
-}
-
-let dealerUnderSeventeen = () => {
-  if (dealerTotal < 17) {
-    dealCardToDealer()
-    winnerDeclared()
-  }
-}
-
-playerChoseToStay = () => {
-  document.querySelector('.hide').classList.add('hidden')
-  document.querySelector('.hitbutton').classList.add('hide-button')
-  document.querySelector('.staybutton').classList.add('hide-button')
-
-  dealerUnderSeventeen()
-  dealerUnderSeventeen()
-  dealerUnderSeventeen()
-  dealerUnderSeventeen()
-
-  if (dealerTotal >= 17 && dealerTotal <= 21) {
-    winnerDeclared()
-  }
-
-  if (dealerTotal >= 22) {
-    winnerDeclared()
-  }
-}
-// If player hand is great than 21 player loses
-
-// If player stays dealers needs a hand better than players
 
 const main = () => {
-  let suits = ['C', 'S', 'D', 'H']
-  let cards = [
-    { value: 2, face: '2' },
-    { value: 3, face: '3' },
-    { value: 4, face: '4' },
-    { value: 5, face: '5' },
-    { value: 6, face: '6' },
-    { value: 7, face: '7' },
-    { value: 8, face: '8' },
-    { value: 9, face: '9' },
-    { value: 10, face: '10' },
-    { value: 10, face: 'J' },
-    { value: 10, face: 'Q' },
-    { value: 10, face: 'K' },
-    { value: 11, face: 'A' }
-  ]
-
-  // loop through all the suits
-  suits.forEach(suit => {
-    // Do this for each suit
-
-    // For this suit go through the cards
-    cards.forEach(card => {
-      // make a new card to put in the deck
-      let newCardForTheDeck = {
-        suit: suit,
-        value: card.value,
-        face: card.face
-      }
-
-      // add it to the deck
-      deck.push(newCardForTheDeck)
-    })
-  })
-
-  // Shuffle the deck into a random order
-  //
-  // Uses [Fisher–Yates shuffle](https://en.wikipedia.org/wiki/Fisher–Yates_shuffle)
-  for (let i = 52 - 1; i > 1; i -= 1) {
-    let j = Math.floor(Math.random() * i)
-    let firstCard = deck[i]
-    let secondCard = deck[j]
-    deck[i] = secondCard
-    deck[j] = firstCard
-  }
-
+  dealCardToPlayer('up')
+  dealCardToPlayer('up')
   dealCardToDealer('up')
-  dealCardToDealer('down')
 
-  dealCardToPlayer('up')
-  dealCardToPlayer('up')
-  countPlayerTotal()
+  // dealCardToDealer('down')
+  showPlayerValue()
 
-  let playerHit = document.querySelector('.hitbutton')
-  playerHit.addEventListener('click', playerChoseToHit)
+  // makes the dealer score a ? at the begining
+  showDealer.textContent = '?'
 
-  let playerStay = document.querySelector('.staybutton')
-  playerStay.addEventListener('click', playerChoseToStay)
+  // message for begining of game
+  displayStatus.textContent =
+    'YOU HAVE ' + `${showPlayer.textContent}` + ', HIT OR STAY'
 
-  document
-    .querySelector('.hitbutton')
-    .addEventListener('click', dealCardToPlayer)
-
-  document
-    .querySelector('.hitbutton')
-    .addEventListener('click', countPlayerTotal)
-
-  document.querySelector('.staybutton').addEventListener('click, stayButton')
-
-  document.querySelector('.new-game').addEventListener('click', () => {
+  // all the event listener for the buttons
+  document.querySelector('.hits').addEventListener('click', giveMore)
+  document.querySelector('.stays').addEventListener('click', noMore)
+  document.querySelector('.reset').addEventListener('click', () => {
     document.location = '/'
   })
 }
