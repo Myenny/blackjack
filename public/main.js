@@ -215,9 +215,6 @@ const main = () => {
   // dealCardToDealer('down')
   showPlayerValue()
 
-  // makes the dealer score a ? at the begining
-  showDealer.textContent = '?'
-
   // message for begining of game
   displayStatus.textContent =
     'YOU HAVE ' + `${showPlayer.textContent}` + ', HIT OR STAY'
